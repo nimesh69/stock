@@ -10,3 +10,5 @@ backend/.venv/
 # Local logs and command text files (if not meant for tracking)
 commands.txt
 progress.md
+.venv/
+backend/.venv/
