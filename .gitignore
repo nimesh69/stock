@@ -1,3 +1,12 @@
-progress.md
-commands.txt
+# Environment variables and secrets
 .env
+
+# Virtual environments
+.venv/
+env/
+venv/
+backend/.venv/
+
+# Local logs and command text files (if not meant for tracking)
+commands.txt
+progress.md
