@@ -10,7 +10,6 @@ sharesansar.com's today-share-price table.
 
 from django.core.management.base import BaseCommand
 from companies.models import Company
-
 WATCHLIST = [
     {
         "symbol": "NABIL",
@@ -20,9 +19,11 @@ WATCHLIST = [
             "Nabil",
             "Nabil Bank",
             "Nabil Bank Limited",
+            "NABIL",
         ],
         "description": (
-            "Commercial bank in Nepal providing banking " "and financial services."
+            "Commercial bank in Nepal providing banking "
+            "and financial services."
         ),
     },
     {
@@ -33,10 +34,12 @@ WATCHLIST = [
             "Chilime",
             "Chilime Hydropower",
             "Chilime Hydropower Company",
+            "Chilime Hydropower Company Limited",
             "CHCL",
         ],
         "description": (
-            "Hydropower company in Nepal involved in " "electricity generation."
+            "Hydropower company in Nepal involved in "
+            "electricity generation."
         ),
     },
     {
@@ -47,10 +50,12 @@ WATCHLIST = [
             "Nepal Life",
             "Nepal Life Insurance",
             "Nepal Life Insurance Company",
+            "Nepal Life Insurance Company Limited",
             "NLIC",
         ],
         "description": (
-            "Life insurance company in Nepal providing " "life insurance services."
+            "Life insurance company in Nepal providing "
+            "life insurance services."
         ),
     },
     {
@@ -61,9 +66,12 @@ WATCHLIST = [
             "Shivam",
             "Shivam Cement",
             "Shivam Cements",
+            "Shivam Cements Limited",
             "SHIVM",
         ],
-        "description": ("Cement manufacturing company in Nepal."),
+        "description": (
+            "Cement manufacturing company in Nepal."
+        ),
     },
     {
         "symbol": "ICFC",
@@ -74,7 +82,55 @@ WATCHLIST = [
             "ICFC Finance",
             "ICFC Finance Limited",
         ],
-        "description": ("Finance company in Nepal providing " "financial services."),
+        "description": (
+            "Finance company in Nepal providing "
+            "financial services."
+        ),
+    },
+    {
+        "symbol": "MLBSL",
+        "name": "Mithila Laghubitta Bittiya Sanstha Limited",
+        "sector": "Microfinance",
+        "aliases": [
+            "MLBSL",
+            "Mithila Laghubitta",
+            "Mithila Laghubitta Bittiya Sanstha",
+            "Mithila Laghubitta Bittiya Sanstha Limited",
+        ],
+        "description": (
+            "Microfinance company in Nepal providing "
+            "microfinance and financial services."
+        ),
+    },
+    {
+        "symbol": "SGHL",
+        "name": "Sanigad Hydro Limited",
+        "sector": "Hydropower",
+        "aliases": [
+            "SGHL",
+            "Sanigad Hydro",
+            "Sanigad Hydropower",
+            "Sanigad Hydro Limited",
+        ],
+        "description": (
+            "Hydropower company in Nepal involved in "
+            "hydroelectricity generation."
+        ),
+    },
+    {
+        "symbol": "NMLBBL",
+        "name": "NMB Laghubitta Bittiya Sanstha Limited",
+        "sector": "Microfinance",
+        "aliases": [
+            "NMLBBL",
+            "NMB Laghubitta",
+            "NMB Laghubitta Bittiya Sanstha",
+            "NMB Laghubitta Bittiya Sanstha Limited",
+        ],
+        "description": (
+            "Microfinance company in Nepal providing "
+            "microfinance and financial services."
+        ),
     },
 ]
 

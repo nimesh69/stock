@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
-from celery.schedules import crontab
+# Background crawling is paused for now. Keep this import with the beat
+# schedule below when re-enabling Celery beat.
+# from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,7 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",   # gives you the Token model + obtain-token view
-    # "accounts",
+    "corsheaders",
+    "accounts",
     "channels",
     "news",
     "companies",
@@ -50,6 +53,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+        "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -60,7 +66,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "Stock.urls"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -86,17 +101,21 @@ REST_FRAMEWORK = {
 }
 ASGI_APPLICATION = 'Stock.asgi.application'
 ALLOWED_HOSTS = ['*']
+
 # WSGI_APPLICATION = "myproject.wsgi.application"
-CELERY_BEAT_SCHEDULE = {
-    "sharesansar-news": {
-        "task": "crawler.tasks.crawl_share_news",
-        "schedule": crontab(hour=6, minute=0),
-    },
-    "sharesansar-prices": {
-        "task": "crawler.tasks.crawl_share_prices",
-        "schedule": 30 * 24 * 60 * 60,
-    },
-}
+# Background crawling is paused for now. Startup crawling is wired in
+# docker-compose.yml so `docker compose up` seeds/crawls/categorizes once.
+# CELERY_BEAT_SCHEDULE = {
+#     "sharesansar-news": {
+#         "task": "crawler.tasks.crawl_share_news",
+#         "schedule": crontab(minute="*/3"),
+#         # "schedule": crontab(hour=6, minute=0),
+#     },
+#     "sharesansar-prices": {
+#         "task": "crawler.tasks.crawl_share_prices",
+#         "schedule": 30 * 24 * 60 * 60,
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
