@@ -5,10 +5,13 @@
 .venv/
 env/
 venv/
-backend/.venv/
 
-# Local logs and command text files (if not meant for tracking)
+# Local logs and command text files
 commands.txt
 progress.md
-.venv/
-backend/.venv/
+
+# Python cache (Global rules)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

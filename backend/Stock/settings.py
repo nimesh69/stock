@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",   # gives you the Token model + obtain-token view
-    # "accounts",
+    "corsheaders",
+    "accounts",
     "channels",
     "news",
     "companies",
@@ -52,6 +53,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+        "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -62,7 +66,16 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "Stock.urls"
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]
 
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
