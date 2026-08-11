@@ -41,7 +41,7 @@ class ArticleCategory(models.Model):
     method = models.CharField(
         max_length=20,
         choices=METHOD_CHOICES,
-        default="hybrid",
+        default="embedding",
     )
 
     created_at = models.DateTimeField(

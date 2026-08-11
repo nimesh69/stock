@@ -88,18 +88,13 @@ ASGI_APPLICATION = 'Stock.asgi.application'
 ALLOWED_HOSTS = ['*']
 # WSGI_APPLICATION = "myproject.wsgi.application"
 CELERY_BEAT_SCHEDULE = {
-    "test-crawl-and-embed": {
-        "task": "crawler.tasks.run_full_pipeline",
-        "schedule": crontab(minute="*/1"),  # every minute, for testing
-    },
-    # keep or remove these once you're done testing
     "sharesansar-news": {
         "task": "crawler.tasks.crawl_share_news",
-        "schedule": 30 * 60,
+        "schedule": crontab(hour=6, minute=0),
     },
     "sharesansar-prices": {
         "task": "crawler.tasks.crawl_share_prices",
-        "schedule": crontab(hour=18, minute=0),
+        "schedule": 30 * 24 * 60 * 60,
     },
 }
 

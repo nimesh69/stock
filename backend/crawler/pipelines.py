@@ -2,6 +2,7 @@
 crawler/pipelines.py
 
 Pipelines for writing Scrapy items into Django/PostgreSQL.
+
 Django ORM operations are wrapped with sync_to_async because
 Scrapy processes items asynchronously.
 """
@@ -14,6 +15,9 @@ from asgiref.sync import sync_to_async
 class DjangoWritePipeline:
 
     async def process_item(self, item, spider):
+        if spider.name != "sharesansar_news":
+            return item
+
         await self.save_article(item)
         return item
 

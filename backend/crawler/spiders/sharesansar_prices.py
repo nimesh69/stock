@@ -1,11 +1,13 @@
 import scrapy
 from datetime import datetime, timedelta
 
+from asgiref.sync import sync_to_async
 from companies.models import Company
-
+from decimal import Decimal, InvalidOperation
 
 class ShareSansarPricesSpider(scrapy.Spider):
     name = "sharesansar_prices"
+
     start_urls = [
         "https://www.sharesansar.com/today-share-price"
     ]
@@ -16,16 +18,23 @@ class ShareSansarPricesSpider(scrapy.Spider):
         "USER_AGENT": "StockAppAssignmentCrawler/1.0",
     }
 
-    DAYS_BACK = 1
+    DAYS_BACK = 30
 
-    def parse(self, response):
-        self.watchlist_symbols = set(
+    @sync_to_async
+    def get_watchlist_symbols(self):
+        return set(
             Company.objects.values_list("symbol", flat=True)
         )
 
-        today = response.css("input#fromdate::attr(value)").get()
+    async def parse(self, response):
+        self.watchlist_symbols = await self.get_watchlist_symbols()
 
-        yield from self.extract_rows(response, today)
+        today = response.css(
+            "input#fromdate::attr(value)"
+        ).get()
+
+        for item in self.extract_rows(response, today):
+            yield item
 
         for i in range(1, self.DAYS_BACK):
             target_date = (
@@ -45,7 +54,8 @@ class ShareSansarPricesSpider(scrapy.Spider):
             )
 
     def parse_historical(self, response, date):
-        yield from self.extract_rows(response, date)
+        for item in self.extract_rows(response, date):
+            yield item
 
     def extract_rows(self, response, date):
         for row in response.css("table tbody tr"):
@@ -68,13 +78,29 @@ class ShareSansarPricesSpider(scrapy.Spider):
                 raw = cells[idx].css("::text").get() or "0"
                 return raw.strip().replace(",", "")
 
+            def decimal(idx):
+                value = clean(idx)
+
+                try:
+                    return Decimal(value)
+                except InvalidOperation:
+                    return Decimal("0")
+
+            def integer(idx):
+                value = clean(idx)
+
+                try:
+                    return int(Decimal(value))
+                except (ValueError, InvalidOperation):
+                    return 0
+
             yield {
                 "symbol": symbol,
                 "date": date,
-                "open": clean(3),
-                "high": clean(4),
-                "low": clean(5),
-                "close": clean(6),
-                "volume": clean(11),
-                "turnover": clean(13),
+                "open": decimal(3),
+                "high": decimal(4),
+                "low": decimal(5),
+                "close": decimal(6),
+                "volume": integer(11),
+                "turnover": decimal(13),
             }
