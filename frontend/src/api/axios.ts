@@ -1,11 +1,10 @@
 import axios from "axios";
-// import.meta.env
+
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000",
   withCredentials: true,
 });
 
-// ─── Request interceptor ───────────────────────────────────────────────────
 axiosInstance.interceptors.request.use(
   (config) => {
     const csrfToken = document.cookie
@@ -16,10 +15,6 @@ axiosInstance.interceptors.request.use(
       config.headers["X-CSRFToken"] = csrfToken;
     }
 
-    // Keep your FormData logging if needed
-    // let dataToLog = config.data;
-    // if (config.data instanceof FormData) { ... }
-
     return config;
   },
   (error) => {
@@ -28,18 +23,4 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-// ─── Response interceptor ──────────────────────────────────────────────────
-interface QueueItem {
-  resolve: (value?: unknown) => void;
-  reject: (error: unknown) => void;
-}
-let isRefreshing = false;
-let failedQueue: QueueItem[] = [];
-
-const processQueue = (error: unknown) => {
-  failedQueue.forEach(({ resolve, reject }) =>
-    error ? reject(error) : resolve(),
-  );
-  failedQueue = [];
-};
 export default axiosInstance;

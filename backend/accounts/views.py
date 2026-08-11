@@ -5,20 +5,20 @@ from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework.permissions import AllowAny
 # accounts/views.py
 
 from django.middleware.csrf import get_token
 
 
 class CsrfTokenView(APIView):
-
+    permission_classes = [AllowAny]
     def get(self, request):
         return Response({
             "csrfToken": get_token(request)
         })
 class SignUpView(APIView):
-
+    permission_classes = [AllowAny]
     def post(self, request):
         username = request.data.get("username")
         email = request.data.get("email")
@@ -56,7 +56,7 @@ class SignUpView(APIView):
         )
         
 class LoginView(APIView):
-
+    permission_classes = [AllowAny]
     def post(self, request):
         username = request.data.get("username")
         password = request.data.get("password")

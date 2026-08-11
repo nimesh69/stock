@@ -11,7 +11,8 @@ RUN npm install
 # Copy the rest of the application source code
 COPY . /frontend/
 
-EXPOSE 3000
+# Match Vite's default dev port
+EXPOSE 5173
 
-# Start command (change to "npm run dev" if you are using Vite)
-CMD ["npm", "start"]
+# Run the Vite development server accessible from outside the container
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

@@ -71,11 +71,15 @@ MIDDLEWARE = [
 ROOT_URLCONF = "Stock.urls"
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:3000",
+
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:3000",
+
 ]
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
@@ -96,7 +100,7 @@ TEMPLATES = [
 ]
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -106,8 +110,6 @@ ASGI_APPLICATION = 'Stock.asgi.application'
 ALLOWED_HOSTS = ['*']
 
 # WSGI_APPLICATION = "myproject.wsgi.application"
-# Background crawling is paused for now. Startup crawling is wired in
-# docker-compose.yml so `docker compose up` seeds/crawls/categorizes once.
 CELERY_BEAT_SCHEDULE = {
     "sharesansar-news": {
         "task": "crawler.tasks.crawl_share_news",
