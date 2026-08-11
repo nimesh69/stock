@@ -9,7 +9,7 @@ class RawArticle(models.Model):
     source_portal = models.CharField(max_length=50)
     headline = models.CharField(max_length=500)
     body = models.TextField()
-    url = models.URLField(unique=True)
+    url = models.URLField(max_length=500,unique=True)
     published_at = models.DateTimeField(null=True, blank=True)
     scraped_at = models.DateTimeField(auto_now_add=True)
 

@@ -30,14 +30,18 @@ services:
     build:
       context: ./backend
     image: stock-backend
+    working_dir: /backend
     command: >
-      sh -c "python manage.py migrate &&
-            #  python manage.py seed_companies &&
-            #  python manage.py generate_company_embeddings &&
-            #  python manage.py crawl_spider sharesansar_prices &&
-            #  python manage.py crawl_spider sharesansar_news &&
-             python manage.py categorize_news_by_embeddings &&
-             uvicorn Stock.asgi:application --host 0.0.0.0 --port 8000 --reload"
+      sh -c "
+        pip install --upgrade pip &&
+        pip install -r requirements.txt &&
+        python manage.py makemigrations &&
+        python manage.py migrate &&
+        python manage.py collectstatic --noinput &&
+        # python manage.py seed_companies &&
+        # python manage.py generate_company_embeddings &&
+        uvicorn Stock.asgi:application --host 0.0.0.0 --port 8000 --reload
+      "
     volumes:
       - ./backend:/backend
       - /backend/.venv/
@@ -56,66 +60,110 @@ services:
       redis:
         condition: service_healthy
 
-  # celery-worker:
-  #   build:
-  #     context: ./backend
-  #   image: stock-backend
-  #   # 1. ADD THIS LINE:
-  #   working_dir: /backend
-  #   command: celery -A Stock worker -l info
-  #   volumes:
-  #     - ./backend:/backend
-  #     - /backend/.venv/
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_HOST: db
-  #     POSTGRES_PORT: 5432
-  #     CELERY_BROKER_URL: redis://redis:6379/0
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
+  celery-worker:
+    build:
+      context: ./backend
+    image: stock-backend
+    working_dir: /backend
+    command: celery -A Stock worker -l info
+    volumes:
+      - ./backend:/backend
+      - /backend/.venv/
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
-  # celery-beat:
-  #   build:
-  #     context: ./backend
-  #   image: stock-backend
-  #   # 2. ADD THIS LINE:
-  #   working_dir: /backend
-  #   command: celery -A Stock beat -l info
-  #   volumes:
-  #     - ./backend:/backend
-  #     - /backend/.venv/
-  #   environment:
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_HOST: db
-  #     POSTGRES_PORT: 5432
-  #     CELERY_BROKER_URL: redis://redis:6379/0
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #     redis:
-  #       condition: service_healthy
+  celery-beat:
+    build:
+      context: ./backend
+    image: stock-backend
+    working_dir: /backend
+    command: celery -A Stock beat -l info
+    volumes:
+      - ./backend:/backend
+      - /backend/.venv/
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
+  celery-startup:
+    build:
+      context: ./backend
+    image: stock-backend
+    working_dir: /backend
+    command: >
+      sh -c '
+        if [ ! -f /startup-data/initial_crawl_done ]; then
+          echo "========================================";
+          echo "Running initial crawlers...";
+          echo "========================================";
+
+          celery -A Stock call crawler.tasks.crawl_share_news &&
+          celery -A Stock call crawler.tasks.crawl_share_prices &&
+
+          touch /startup-data/initial_crawl_done;
+
+          echo "========================================";
+          echo "Initial crawlers completed.";
+          echo "========================================";
+        else
+          echo "========================================";
+          echo "Initial crawlers already completed.";
+          echo "Skipping startup crawl.";
+          echo "========================================";
+        fi
+      '
+    volumes:
+      - ./backend:/backend
+      - /backend/.venv/
+      - celery_startup_data:/startup-data
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      celery-worker:
+        condition: service_started
 
   frontend:
-    build:
-      context: ./frontend
-    command: npm run dev -- --host 0.0.0.0
-    volumes:
-      - ./frontend:/frontend
-      - /frontend/node_modules/
-    ports:
-      - "3000:3000"
-    environment:
-      CHOKIDAR_USEPOLLING: "true"
-    depends_on:
-      - web
+      build:
+        context: ./frontend
+      command: npm run dev -- --host 0.0.0.0
+      volumes:
+        - ./frontend:/frontend
+        - /frontend/node_modules/
+      ports:
+        - "3000:5173"  # Maps localhost:3000 on host -> 5173 inside container
+      environment:
+        CHOKIDAR_USEPOLLING: "true"
+      depends_on:
+        - web
 
 volumes:
   postgres_data:
+  celery_startup_data:

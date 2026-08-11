@@ -10,6 +10,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
+        ("companies","0000_enable_pgvector"),
     ]
 
     operations = [

@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 from pathlib import Path
 import os
+from celery.schedules import crontab
 # Background crawling is paused for now. Keep this import with the beat
 # schedule below when re-enabling Celery beat.
 # from celery.schedules import crontab
@@ -35,6 +36,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
         "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -105,17 +108,17 @@ ALLOWED_HOSTS = ['*']
 # WSGI_APPLICATION = "myproject.wsgi.application"
 # Background crawling is paused for now. Startup crawling is wired in
 # docker-compose.yml so `docker compose up` seeds/crawls/categorizes once.
-# CELERY_BEAT_SCHEDULE = {
-#     "sharesansar-news": {
-#         "task": "crawler.tasks.crawl_share_news",
-#         "schedule": crontab(minute="*/3"),
-#         # "schedule": crontab(hour=6, minute=0),
-#     },
-#     "sharesansar-prices": {
-#         "task": "crawler.tasks.crawl_share_prices",
-#         "schedule": 30 * 24 * 60 * 60,
-#     },
-# }
+CELERY_BEAT_SCHEDULE = {
+    "sharesansar-news": {
+        "task": "crawler.tasks.crawl_share_news",
+        # "schedule": crontab(minute="*/3"),
+        "schedule": crontab(hour=6, minute=0),
+    },
+    "sharesansar-prices": {
+        "task": "crawler.tasks.crawl_share_prices",
+        "schedule": 30 * 24 * 60 * 60,
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -144,7 +147,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
 
-
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+# SPECTACULAR_SETTINGS = {
+#     "TITLE": "Your API",
+#     "DESCRIPTION": "API documentation",
+# }
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
