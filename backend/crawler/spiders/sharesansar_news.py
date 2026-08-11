@@ -15,7 +15,7 @@ class ShareSansarNewsSpider(scrapy.Spider):
         "USER_AGENT": "StockAppAssignmentCrawler/1.0",
     }
 
-    MAX_AGE_DAYS = 1
+    MAX_AGE_DAYS = 10
 
     def parse(self, response):
         stop_paginating = False
