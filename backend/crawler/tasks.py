@@ -1,6 +1,8 @@
 from celery import shared_task, chain
 from django.core.management import call_command
 
+from analysis.tasks import compute_behavior_summary_all_companies
+
 
 @shared_task
 def crawl_share_prices():
@@ -23,9 +25,10 @@ def generate_embeddings_task():
 
 @shared_task
 def run_full_pipeline():
-    """Crawl prices -> crawl news -> generate article categories, in order."""
+    """Crawl prices -> compute behavior summary -> crawl news -> categorize, in order."""
     chain(
         crawl_share_prices.si(),
+        compute_behavior_summary_all_companies.si(),
         crawl_share_news.si(),
     ).apply_async()
 
