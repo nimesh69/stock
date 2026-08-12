@@ -130,32 +130,37 @@ services:
       context: ./backend
     image: stock-backend
     working_dir: /backend
+
     command:
       - sh
       - -c
       - |
         if [ ! -f /startup-data/initial_crawl_done ]; then
           echo "========================================"
-          echo "Running initial 30-day crawlers..."
+          echo "Running initial 30-day pipeline..."
           echo "========================================"
-  
-          celery -A Stock call crawler.tasks.crawl_share_news --kwargs='{"days_back": 30}' &&
-          celery -A Stock call crawler.tasks.crawl_share_prices --kwargs='{"days_back": 30}' &&
+
+          python manage.py crawl_spider sharesansar_prices --days-back 30 &&
+          python manage.py compute_behavior_summary_all_companies &&
+          python manage.py crawl_spider sharesansar_news --days-back 30 &&
+          python manage.py categorize_news_by_embeddings &&
           touch /startup-data/initial_crawl_done
-  
+
           echo "========================================"
-          echo "Initial 30-day crawlers completed."
+          echo "Initial 30-day pipeline completed."
           echo "========================================"
         else
           echo "========================================"
-          echo "Initial crawlers already completed."
+          echo "Initial pipeline already completed."
           echo "Skipping startup crawl."
           echo "========================================"
         fi
+
     volumes:
       - ./backend:/backend
       - /backend/.venv/
       - celery_startup_data:/startup-data
+
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -163,13 +168,12 @@ services:
       POSTGRES_HOST: db
       POSTGRES_PORT: 5432
       CELERY_BROKER_URL: redis://redis:6379/0
+
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_healthy
-      celery-worker:
-        condition: service_started
       init-db:
         condition: service_completed_successfully
 
