@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",   # gives you the Token model + obtain-token view
+    "drf_spectacular",
     "corsheaders",
     "accounts",
     "channels",
@@ -99,12 +100,15 @@ TEMPLATES = [
     },
 ]
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+        "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 20,
 }
 ASGI_APPLICATION = 'Stock.asgi.application'
 ALLOWED_HOSTS = ['*']
@@ -151,10 +155,12 @@ AUTH_PASSWORD_VALIDATORS = [
 
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
-# SPECTACULAR_SETTINGS = {
-#     "TITLE": "Your API",
-#     "DESCRIPTION": "API documentation",
-# }
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Your API",
+    "DESCRIPTION": "API documentation",
+    "VERSION": "1.0.0",
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
 
