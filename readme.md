@@ -422,20 +422,13 @@ Market Analysis
   └── Market Pressure Indicators
 ```
 
-> Add the project's actual database schema image here when the diagram is available in the repository.
 
-Recommended README location:
 
-```text
-docs/
-└── database-schema.png
-```
 
-Then embed it with:
 
-```markdown
-![Database Schema](docs/database-schema.png)
-```
+### Database Visual Architecture (ERD)
+[![Database ERD](/backend/docs/Untitled.png)](/backend/docs/Untitled.png)
+
 
 ---
 
@@ -1107,27 +1100,6 @@ Behavior Summary & Market Pressure Indicator — Technical Documentation.md
 ```
 
 Understand buyer/seller behavior analysis and the market-pressure indicator.
-
----
-
-# 🤝 Contributing
-
-Before making changes:
-
-1. Understand the relevant backend/frontend module.
-2. Read the associated technical documentation.
-3. Configure your local environment.
-4. Run the application locally.
-5. Test API and frontend behavior.
-6. Test data-processing changes carefully.
-7. Avoid committing environment secrets.
-8. Update documentation when architecture or workflows change.
-
----
-
-# 📄 License
-
-Add the project's applicable license information here.
 
 ---
 
