@@ -1,7 +1,9 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoginPage from "../auth/LoginPage";
 import SignupPage from "../auth/SignupPage";
-import Dashboard, { CompanyDashboard, NewsDetail } from "../dashboard/dashboard";
+import CompanyDashboard from "../dashboard/CompanyDashboard";
+import Dashboard from "../dashboard/DashboardPage";
+import NewsDetail from "../dashboard/NewsDetail";
 import type { User } from "../types/auth.types";
 
 interface AppRoutesProps {
