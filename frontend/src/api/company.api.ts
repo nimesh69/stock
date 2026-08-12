@@ -6,10 +6,12 @@ import type {
   CompanyPricesParams,
 } from "../types/company.types";
 
-const COMPANY_BASE = "/companies";
+const COMPANY_BASE = "/api/companies";
 
-export const getCompanies = async () => {
-  const response = await axiosInstance.get<CompanyListResponse>(`${COMPANY_BASE}`);
+export const getCompanies = async (page: number = 1) => {
+  const response = await axiosInstance.get<CompanyListResponse>(`${COMPANY_BASE}`, {
+    params: { page },
+  });
   return response.data;
 };
 

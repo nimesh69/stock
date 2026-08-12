@@ -26,7 +26,8 @@ services:
       timeout: 5s
       retries: 5
 
-  web:
+  # Initialization container: Seeds data and generates embeddings first
+  init-db:
     build:
       context: ./backend
     image: stock-backend
@@ -38,10 +39,28 @@ services:
         python manage.py makemigrations &&
         python manage.py migrate &&
         python manage.py collectstatic --noinput &&
-        # python manage.py seed_companies &&
-        # python manage.py generate_company_embeddings &&
-        uvicorn Stock.asgi:application --host 0.0.0.0 --port 8000 --reload
+        python manage.py seed_companies &&
+        python manage.py generate_company_embeddings
       "
+    volumes:
+      - ./backend:/backend
+      - /backend/.venv/
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_HOST: db
+      POSTGRES_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./backend
+    image: stock-backend
+    working_dir: /backend
+    command: uvicorn Stock.asgi:application --host 0.0.0.0 --port 8000 --reload
     volumes:
       - ./backend:/backend
       - /backend/.venv/
@@ -59,6 +78,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      init-db:
+        condition: service_completed_successfully
 
   celery-worker:
     build:
@@ -109,28 +130,28 @@ services:
       context: ./backend
     image: stock-backend
     working_dir: /backend
-    command: >
-      sh -c '
+    command:
+      - sh
+      - -c
+      - |
         if [ ! -f /startup-data/initial_crawl_done ]; then
-          echo "========================================";
-          echo "Running initial crawlers...";
-          echo "========================================";
-
-          celery -A Stock call crawler.tasks.crawl_share_news &&
-          celery -A Stock call crawler.tasks.crawl_share_prices &&
-
-          touch /startup-data/initial_crawl_done;
-
-          echo "========================================";
-          echo "Initial crawlers completed.";
-          echo "========================================";
+          echo "========================================"
+          echo "Running initial 30-day crawlers..."
+          echo "========================================"
+  
+          celery -A Stock call crawler.tasks.crawl_share_news --kwargs='{"days_back": 30}' &&
+          celery -A Stock call crawler.tasks.crawl_share_prices --kwargs='{"days_back": 30}' &&
+          touch /startup-data/initial_crawl_done
+  
+          echo "========================================"
+          echo "Initial 30-day crawlers completed."
+          echo "========================================"
         else
-          echo "========================================";
-          echo "Initial crawlers already completed.";
-          echo "Skipping startup crawl.";
-          echo "========================================";
+          echo "========================================"
+          echo "Initial crawlers already completed."
+          echo "Skipping startup crawl."
+          echo "========================================"
         fi
-      '
     volumes:
       - ./backend:/backend
       - /backend/.venv/
@@ -149,20 +170,23 @@ services:
         condition: service_healthy
       celery-worker:
         condition: service_started
+      init-db:
+        condition: service_completed_successfully
 
   frontend:
-      build:
-        context: ./frontend
-      command: npm run dev -- --host 0.0.0.0
-      volumes:
-        - ./frontend:/frontend
-        - /frontend/node_modules/
-      ports:
-        - "3000:5173"  # Maps localhost:3000 on host -> 5173 inside container
-      environment:
-        CHOKIDAR_USEPOLLING: "true"
-      depends_on:
-        - web
+    build:
+      context: ./frontend
+    command: npm run dev -- --host 0.0.0.0
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules/
+    ports:
+      - "3000:5173"
+    environment:
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      web:
+        condition: service_started
 
 volumes:
   postgres_data:

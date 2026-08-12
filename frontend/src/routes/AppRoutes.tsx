@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import LoginPage from "../auth/LoginPage";
 import SignupPage from "../auth/SignupPage";
-import Dashboard from "../dashboard/dashboard";
+import Dashboard, { CompanyDashboard, NewsDetail } from "../dashboard/dashboard";
 import type { User } from "../types/auth.types";
 
 interface AppRoutesProps {
@@ -67,6 +67,22 @@ export default function AppRoutes({ currentUser, onAuthenticated, onLogout }: Ap
           element={
             <AuthenticatedRoute currentUser={currentUser}>
               <Dashboard user={currentUser!} onLogout={onLogout} />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/companies/:id"
+          element={
+            <AuthenticatedRoute currentUser={currentUser}>
+              <CompanyDashboard user={currentUser!} onLogout={onLogout} />
+            </AuthenticatedRoute>
+          }
+        />
+        <Route
+          path="/news/:id"
+          element={
+            <AuthenticatedRoute currentUser={currentUser}>
+              <NewsDetail user={currentUser!} onLogout={onLogout} />
             </AuthenticatedRoute>
           }
         />

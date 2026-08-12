@@ -34,8 +34,7 @@ class DailyPrice(models.Model):
         return f"{self.company.symbol} {self.date}"
 
 
-# Optional — only needed if you end up sampling floorsheet data.
-# Not required for the 10-hour scope; safe to leave unmigrated/unused.
+
 class FloorsheetTransaction(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="floorsheet_entries")
     date = models.DateField()
