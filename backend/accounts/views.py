@@ -69,7 +69,7 @@ class LoginView(APIView):
 
         if user is None:
             return Response(
-                {"detail": "Invalid username or password."},
+                {"detail": "Invalid credentials."},
                 status=status.HTTP_401_UNAUTHORIZED,
             )
 
