@@ -115,14 +115,10 @@ ALLOWED_HOSTS = ['*']
 
 # WSGI_APPLICATION = "myproject.wsgi.application"
 CELERY_BEAT_SCHEDULE = {
-    "sharesansar-news": {
-        "task": "crawler.tasks.crawl_share_news",
-        # "schedule": crontab(minute="*/3"),
-        "schedule": crontab(hour=6, minute=0),
-    },
-    "sharesansar-prices": {
-        "task": "crawler.tasks.crawl_share_prices",
-        "schedule": 30 * 24 * 60 * 60,
+    "full-pipeline": {
+        "task": "crawler.tasks.run_full_pipeline",
+        "schedule": crontab(hour=11, minute=15),  # 11:15 UTC = 5:00 PM NPT
+        "kwargs": {"days_back":1},
     },
 }
 

@@ -19,9 +19,17 @@ class Command(BaseCommand):
             "spider_name",
             choices=SPIDERS.keys(),
         )
+        # Added --days_back argument (optional, defaults to 1)
+        parser.add_argument(
+            "--days_back",
+            type=int,
+            default=1,
+            help="Number of historical days to crawl (default: 1)",
+        )
 
     def handle(self, *args, **options):
         spider_name = options["spider_name"]
+        days_back = options["days_back"]
         spider_class = SPIDERS[spider_name]
 
         process = CrawlerProcess(
@@ -41,10 +49,11 @@ class Command(BaseCommand):
         )
 
         self.stdout.write(
-            f"Starting spider: {spider_name}"
+            f"Starting spider: {spider_name} with days_back={days_back}"
         )
 
-        process.crawl(spider_class)
+        # Pass days_back as a keyword argument to the spider's __init__
+        process.crawl(spider_class, days_back=days_back)
         process.start()
 
         self.stdout.write(

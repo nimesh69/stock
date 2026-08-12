@@ -29,8 +29,7 @@ class BehaviorSummary(models.Model):
         return f"{self.company.symbol} {self.date} — {self.pressure_indicator}"
 
 
-# Optional / stretch — only build this out if VWAP + pressure + anomaly are
-# already solid and time remains. Safe to skip for the 10-hour scope.
+
 class NewsPriceCorrelation(models.Model):
     company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name="news_correlations")
     window_start = models.DateField()
