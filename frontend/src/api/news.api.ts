@@ -1,7 +1,7 @@
 import axiosInstance from "./axios";
 import type { ArticleListResponse, ArticleDetail } from "../types/news.types";
 
-const NEWS_BASE = "/news";
+const NEWS_BASE = "/api/news";
 
 export const getArticles = async (page: number = 1) => {
   const response = await axiosInstance.get<ArticleListResponse>(`${NEWS_BASE}`, {
@@ -16,7 +16,7 @@ export const getArticleById = async (id: number | string) => {
 };
 export const getCompanyArticles = async (companyId: number | string, page: number = 1) => {
   const response = await axiosInstance.get<ArticleListResponse>(
-    `/companies/${companyId}/news`,
+    `${NEWS_BASE}/${companyId}/news`,
     { params: { page } }
   );
   return response.data;

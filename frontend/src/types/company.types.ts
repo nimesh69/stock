@@ -29,10 +29,11 @@ export interface CompanyPricesResponse {
   previous?: string | null;
 }
 
-export type PriceRange = "7d" | "30d" | "90d" | "1y" | "all";
+export type PriceRange = "1d" | "7d" | "30d" | "90d" | "1y" | "all";
 
 export interface CompanyPricesParams {
   range?: PriceRange;
   from?: string; // "YYYY-MM-DD"
+  page?: number;
   to?: string; // "YYYY-MM-DD"
 }
