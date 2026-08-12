@@ -56,9 +56,11 @@ Then:
 ```bash
 cd backend
 
-python3.12 -m venv .venv
+python -m venv .venv
+for linux
 source .venv/bin/activate
-
+for windows
+.\.venv\Scripts\Activate
 pip install -r requirements.txt
 
 cd ../frontend
