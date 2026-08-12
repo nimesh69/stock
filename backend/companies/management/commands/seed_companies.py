@@ -117,21 +117,21 @@ WATCHLIST = [
             "hydroelectricity generation."
         ),
     },
-    {
-        "symbol": "NMLBBL",
-        "name": "NMB Laghubitta Bittiya Sanstha Limited",
-        "sector": "Microfinance",
-        "aliases": [
-            "NMLBBL",
-            "NMB Laghubitta",
-            "NMB Laghubitta Bittiya Sanstha",
-            "NMB Laghubitta Bittiya Sanstha Limited",
-        ],
-        "description": (
-            "Microfinance company in Nepal providing "
-            "microfinance and financial services."
-        ),
-    },
+{
+    "symbol": "NMLBBL",
+    "name": "Nerude Mirmire Laghubitta Bittiya Sanstha Limited",
+    "sector": "Microfinance",
+    "aliases": [
+        "NMLBBL",
+        "Nerude Mirmire Laghubitta",
+        "Nerude Mirmire Laghubitta Bittiya Sanstha",
+        "Nerude Mirmire Laghubitta Bittiya Sanstha Limited",
+    ],
+    "description": (
+        "Microfinance company in Nepal providing "
+        "microfinance and financial services."
+    ),
+},
 ]
 
 
