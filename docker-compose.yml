@@ -139,16 +139,22 @@ services:
           echo "========================================"
           echo "Running initial 30-day pipeline..."
           echo "========================================"
-
-          python manage.py crawl_spider sharesansar_prices --days-back 30 &&
-          python manage.py compute_behavior_summary_all_companies &&
-          python manage.py crawl_spider sharesansar_news --days-back 30 &&
-          python manage.py categorize_news_by_embeddings &&
-          touch /startup-data/initial_crawl_done
-
-          echo "========================================"
-          echo "Initial 30-day pipeline completed."
-          echo "========================================"
+    
+          python /backend/crawler/run_initial_pipeline.py
+    
+          if [ $$? -eq 0 ]; then
+            touch /startup-data/initial_crawl_done
+    
+            echo "========================================"
+            echo "Initial 30-day pipeline completed."
+            echo "========================================"
+          else
+            echo "========================================"
+            echo "Initial 30-day pipeline FAILED."
+            echo "Marker will NOT be created."
+            echo "========================================"
+            exit 1
+          fi
         else
           echo "========================================"
           echo "Initial pipeline already completed."

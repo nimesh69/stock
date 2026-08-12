@@ -116,12 +116,13 @@ ALLOWED_HOSTS = ['*']
 # WSGI_APPLICATION = "myproject.wsgi.application"
 CELERY_BEAT_SCHEDULE = {
     "full-pipeline": {
-        "task": "crawler.tasks.run_full_pipeline",
-        "schedule": crontab(hour=11, minute=15),  # 11:15 UTC = 5:00 PM NPT
-        "kwargs": {"days_back":1},
+        "task": "crawler.tasks.start_full_pipeline",
+        "schedule": crontab(hour=11, minute=15),
+        "kwargs": {"days_back": 1},
     },
 }
-
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/1"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
