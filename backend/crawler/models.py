@@ -5,7 +5,6 @@ from django.db import models
 class CrawlRun(models.Model):
     STATUS_CHOICES = [
         ("pending", "Pending"),
-        ("running", "Running"),
         ("success", "Success"),
         ("failed", "Failed"),
     ]

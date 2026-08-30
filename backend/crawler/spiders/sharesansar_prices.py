@@ -3,8 +3,8 @@ from decimal import Decimal, InvalidOperation
 import scrapy
 from asgiref.sync import sync_to_async
 from companies.models import Company
-
-
+from crawler.models import CrawlRun
+from django.utils import timezone
 class ShareSansarPricesSpider(scrapy.Spider):
     name = "sharesansar_prices"
 
@@ -19,7 +19,11 @@ class ShareSansarPricesSpider(scrapy.Spider):
     def __init__(self, days_back=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.days_back = int(days_back)
-
+        self.crawl_run = CrawlRun.objects.create(
+            source="sharesansar_prices",
+            status="pending",
+            started_at=timezone.now(),
+        )
     @sync_to_async
     def get_watchlist_symbols(self):
         return set(Company.objects.values_list("symbol", flat=True))
@@ -132,3 +136,38 @@ class ShareSansarPricesSpider(scrapy.Spider):
                 "volume": integer(11),
                 "turnover": decimal(13),
             }
+
+    
+    async def closed(self, reason):
+        """
+        Called automatically when the spider closes.
+        """
+        from asgiref.sync import sync_to_async
+        from django.db import connection
+    
+        def _persist():
+            stats = self.crawler.stats.get_stats()
+            print("========== CRAWL STATS ==========")
+            print(stats)
+            print("========== CLOSE REASON ==========")
+            print(reason)
+    
+            connection.close_if_unusable_or_obsolete()
+    
+            self.crawl_run.status = (
+                "success" if reason == "finished" else "failed"
+            )
+            self.crawl_run.finished_at = timezone.now()
+            self.crawl_run.stats = {
+                "close_reason": reason,
+                "items_scraped": stats.get("item_scraped_count", 0),
+                "requests": stats.get("downloader/request_count", 0),
+                "responses": stats.get("downloader/response_count", 0),
+                "errors": stats.get("spider_exceptions", 0),
+            }
+            self.crawl_run.save()
+    
+        try:
+            await sync_to_async(_persist, thread_sensitive=True)()
+        except Exception:
+            self.logger.exception("Failed to persist CrawlRun on close")

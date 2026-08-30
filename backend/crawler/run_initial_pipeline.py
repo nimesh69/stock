@@ -21,7 +21,7 @@ from crawler.tasks import (
 from analysis.tasks import compute_behavior_summary_all_companies
 
 
-days_back = 30
+days_back = 60
 
 pipeline = chain(
     crawl_share_prices.si(days_back=days_back),
