@@ -3,6 +3,7 @@ import axios from "axios";
 import { signupUser } from "../api/auth.api";
 import type { User } from "../types/auth.types";
 import type { ApiErrorResponse } from "../types/api.types";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 interface SignupPageProps {
   onAuthenticated: (user: User) => void;
@@ -11,18 +12,25 @@ interface SignupPageProps {
 
 const getErrorMessage = (error: unknown) => {
   if (axios.isAxiosError<ApiErrorResponse>(error)) {
-    return error.response?.data?.detail ?? "Unable to create account. Please try again.";
+    return (
+      error.response?.data?.detail ??
+      "Unable to create account. Please try again."
+    );
   }
 
   return "Unable to create account. Please try again.";
 };
 
-export default function SignupPage({ onAuthenticated, onShowLogin }: SignupPageProps) {
+export default function SignupPage({
+  onAuthenticated,
+  onShowLogin,
+}: SignupPageProps) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -66,16 +74,22 @@ export default function SignupPage({ onAuthenticated, onShowLogin }: SignupPageP
               value={email}
             />
           </label>
-          <label>
+          <label className="auth-password-label">
             Password
             <input
               autoComplete="new-password"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
             />
+            <span
+              className="auth-password-toggle"
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
           </label>
           {error ? <p className="auth-error">{error}</p> : null}
           <button className="auth-submit" disabled={isSubmitting} type="submit">

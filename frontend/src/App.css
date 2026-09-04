@@ -87,7 +87,18 @@
   font-size: 14px;
   padding: 10px 12px;
 }
-
+.auth-password-label {
+  position:relative;
+}
+.auth-password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 75%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--text-h);
+  font-size: 16px;
+}
 .dashboard-page {
   min-height: 100svh;
   padding: 24px;

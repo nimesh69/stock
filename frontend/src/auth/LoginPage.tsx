@@ -2,6 +2,7 @@ import { useState } from "react";
 import { loginUser } from "../api/auth.api";
 import type { User } from "../types/auth.types";
 import type { ApiErrorResponse } from "../types/api.types";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import axios from "axios";
 
 interface LoginPageProps {
@@ -17,12 +18,15 @@ const getErrorMessage = (error: unknown) => {
   return "Unable to login. Please try again.";
 };
 
-export default function LoginPage({ onAuthenticated, onShowSignup }: LoginPageProps) {
+export default function LoginPage({
+  onAuthenticated,
+  onShowSignup,
+}: LoginPageProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [showPassword, setShowPassword] = useState(false);
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
@@ -55,16 +59,22 @@ export default function LoginPage({ onAuthenticated, onShowSignup }: LoginPagePr
               value={username}
             />
           </label>
-          <label>
+          <label className="auth-password-label">
             Password
             <input
               autoComplete="current-password"
               name="password"
               onChange={(event) => setPassword(event.target.value)}
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
             />
+          <span
+            className="auth-password-toggle"
+            onClick={() => setShowPassword((prev) => !prev)}
+          >
+          {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </span>
           </label>
           {error ? <p className="auth-error">{error}</p> : null}
           <button className="auth-submit" disabled={isSubmitting} type="submit">
