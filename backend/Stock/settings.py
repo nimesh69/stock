@@ -112,12 +112,12 @@ REST_FRAMEWORK = {
 }
 ASGI_APPLICATION = 'Stock.asgi.application'
 ALLOWED_HOSTS = ['*']
-
+CELERY_TIMEZONE = 'Asia/Kathmandu'
 # WSGI_APPLICATION = "myproject.wsgi.application"
 CELERY_BEAT_SCHEDULE = {
     "full-pipeline": {
         "task": "crawler.tasks.start_full_pipeline",
-        "schedule": crontab(hour=11, minute=15),
+        "schedule": crontab(hour=17, minute=0),
         "kwargs": {"days_back": 1},
     },
 }
